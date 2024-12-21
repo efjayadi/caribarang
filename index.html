@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Search Tool</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f9f9f9;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-in-out;
+            user-select: none; /* Disable text selection */
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 60px;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            max-width: 550px;
+            width: 90%;
+            animation: scaleUp 0.5s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes scaleUp {
+            from {
+                transform: scale(0.95);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .logo-container img {
+            height: 48px;
+            width: auto;
+            cursor: pointer;
+            transition: filter 0.3s ease;
+        }
+
+        .logo-container img.disabled {
+            filter: grayscale(100%);
+        }
+
+        .input-form {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            padding: 16px 24px;
+            font-size: 18px;
+            border-radius: 30px;
+            border: 1px solid #e0e0e0;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 20px;
+            text-align: center;
+            width: 100%;
+        }
+
+        input[type="text"]:focus {
+            border-color: black;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+        }
+
+        button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 40px;
+            font-size: 18px;
+            border-radius: 30px;
+            background-color: #111;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.3s ease;
+            position: relative;
+            width: 180px;
+        }
+
+        button:hover {
+            background-color: black;
+            transform: scale(0.98); /* Stretch horizontally */
+        }
+
+        button:hover .arrow-icon {
+            display: inline-block; /* Show arrow on hover */
+        }
+
+        .arrow-icon {
+            font-size: 24px;
+            margin-left: 6px;
+            margin-top: 4px;
+            color: white;
+        }
+
+        .footer {
+            font-size: 10px;
+            color: #aaa;
+            padding-top: 10px;
+            margin-bottom: -40px;
+        }
+
+        .footer a {
+            color: #999;
+            text-decoration: none;
+        }
+
+        /* Add thunder emoji to button on hover */
+        button::after {
+            content: "⚡"; /* Thunder emoji */
+            margin-left: 10px;
+            font-size: 20px;
+            color: yellow; /* Yellow emoji */
+            position: absolute;
+            right: 24px;
+            opacity: 0;
+            transform: translateX(-10px); /* Start off slightly to the right */
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+
+        button:hover::after {
+            opacity: 1;
+            transform: translateX(0); /* Move to its original position */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img src="https://freelogopng.com/images/all_img/1691990957tokopedia-icon-png.png" alt="Tokopedia Logo" id="tokopediaLogo" onclick="toggleLogo('tokopedia')">
+            <img src="https://i.pinimg.com/originals/a0/83/b6/a083b6c01e9cfe682b36ac2e9da7ff17.png" alt="Shopee Logo" id="shopeeLogo" onclick="toggleLogo('shopee')">
+            <img src="https://cdn4.iconfinder.com/data/icons/logos-brands-7/512/google_logo-google_icongoogle-512.png" alt="Google Logo" id="googleLogo" onclick="toggleLogo('google')">
+        </div>
+        <h1>Search Multiple Platforms</h1>
+        <div class="input-form">
+            <input type="text" id="searchInput" placeholder="Masukkan kata kunci" onkeypress="handleKeyPress(event)">
+            <button onclick="openTabs()">
+                Search <span class="arrow-icon">↵</span>
+            </button>
+        </div>
+        <p style="font-size:13px;">Gunakan alat ini untuk mencari di Shopee, Tokopedia, dan Google sekaligus.<br>Hemat waktu dan efisien hanya dengan satu klik!</p>
+
+        <div class="footer">
+            <p>&copy; 2024 <a href="https://fajarjayadi.shop" target="_blank">Fajar Jayadi</a>. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script>
+        let searchOptions = {
+            tokopedia: true,
+            shopee: true,
+            google: true
+        };
+
+        function toggleLogo(logo) {
+            // Toggle the search option for the clicked logo
+            searchOptions[logo] = !searchOptions[logo];
+
+            // Disable the logo and apply grayscale if it's disabled
+            const logoElement = document.getElementById(`${logo}Logo`);
+            if (searchOptions[logo]) {
+                logoElement.classList.remove('disabled');
+            } else {
+                logoElement.classList.add('disabled');
+            }
+        }
+
+        function openTabs() {
+            const keyword = document.getElementById('searchInput').value;
+            if (keyword) {
+                const encodedKeyword = encodeURIComponent(keyword);
+                // Open the search only for enabled logos
+                if (searchOptions.tokopedia) {
+                    window.open(`https://www.tokopedia.com/search?st=product&q=${encodedKeyword}`, '_blank');
+                }
+                if (searchOptions.shopee) {
+                    window.open(`https://shopee.co.id/search?keyword=${encodedKeyword}`, '_blank');
+                }
+                if (searchOptions.google) {
+                    window.open(`https://www.google.com/search?q=${encodedKeyword}`, '_blank');
+                }
+            } else {
+                alert("Silakan masukkan kata kunci untuk mencari!");
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                openTabs();
+            }
+        }
+
+        // Anti-Right Click
+        document.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        });
+
+        // Anti-Inspect Tool (basic protection)
+        document.onkeydown = function (e) {
+            if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I") || (e.ctrlKey && e.key === "U")) {
+                alert("Inspect tool is disabled!");
+                return false;
+            }
+        };
+    </script>
+</body>
+</html>
